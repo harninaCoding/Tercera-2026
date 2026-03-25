@@ -15,7 +15,7 @@ class Ejercicio012Test {
 	 float[] misAlturas = {
 		        1.70f, 1.65f, 1.82f, 1.90f, 1.55f, 
 		        1.74f, 1.68f, 1.77f, 1.85f, 1.60f, 
-		        1.72f, 1.69f, 1.81f, 1.76f, 1.88f
+		        1.72f, 1.69f, 1.81f, 1.76f, 1.90f
 		    };
 	 AlumnoManager alumnoObjetMother = new AlumnoManager(misIds, misAlturas);
 
@@ -26,5 +26,12 @@ class Ejercicio012Test {
 		 Ejercicio012 instancia=new Ejercicio012();
 		 assertEquals(media,instancia.getMediaAltura(alumnoObjetMother.getAlumnos()),delta);
 	}
-
+	@Test
+	void testGetMediaAlturaFiltrado() {
+		float media=1.90f;
+		float minima=1.87f;
+		 float delta=0.002f;
+		 Ejercicio012 instancia=new Ejercicio012();
+		 assertEquals(media,instancia.getMediaAlturaFiltrado(alumnoObjetMother.getAlumnos(),minima),delta);
+	}
 }
