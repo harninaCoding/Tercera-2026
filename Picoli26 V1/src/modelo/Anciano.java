@@ -13,8 +13,12 @@ public class Anciano extends Ser {
     }
 
     @Override
-    public double alimentar(double cantidadEntregada) {
+    public void alimentar(double cantidadEntregada) {
+        if (!vivo)
+            return;
+
         double proporcion = cantidadEntregada / necesidadVital;
+
         if (proporcion < 1.0) {
             if (proporcion >= 0.30) {
                 // Entre 99% y 30%, pierde hasta un periodo de forma proporcional a su déficit
@@ -26,6 +30,5 @@ public class Anciano extends Ser {
                 esperanzaVida -= (1.0 + proporcionEnTramo);
             }
         }
-        return cantidadEntregada;
     }
 }

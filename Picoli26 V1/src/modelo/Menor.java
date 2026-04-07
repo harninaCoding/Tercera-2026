@@ -9,13 +9,15 @@ public class Menor extends Ser {
     }
 
     @Override
-    public double alimentar(double cantidadEntregada) {
+    public void alimentar(double cantidadEntregada) {
+        if (!vivo)
+            return;
+
         if (cantidadEntregada >= necesidadVital) {
             factorDesarrollo += 5.55;
         } else if (cantidadEntregada > 0) {
             factorDesarrollo += 5.55 * (cantidadEntregada / necesidadVital);
         }
-        return cantidadEntregada;
     }
 
     public double getFactorDesarrollo() {

@@ -66,7 +66,7 @@ public class SerTest {
         adulto.alimentar(20.0);
 
         assertEquals(0.0, adulto.getAhorros(), 0.01, "Consumido todo ahorro");
-        assertEquals(79.7, adulto.getEsperanzaVida(), 0.201, "Esperanza decrecida 30%");
+        assertEquals(79.7, adulto.getEsperanzaVida(), 0.01, "Esperanza decrecida 30%");
     }
 
     @Test
