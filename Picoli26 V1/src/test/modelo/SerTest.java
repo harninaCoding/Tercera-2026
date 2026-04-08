@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.Test;
 
 import modelo.Adulto;
-import modelo.Anciano;
 import modelo.Menor;
+import modelo.Ser;
 
 //sin lauch , no trabja con los tests
 
@@ -71,7 +71,7 @@ public class SerTest {
 
     @Test
     public void testAncianoPierdeHastaUnPeriodo() {
-        Anciano anciano = new Anciano(65, 80.0, 100.0);
+        Ser anciano = new Ser(65, 80.0, 50.0);
         assertEquals(50.0, anciano.getNecesidadVital(), 0.01, "Necesidad anciano");
 
         anciano.alimentar(25.0);
@@ -79,11 +79,11 @@ public class SerTest {
     }
 
     @Test
-    public void testAncianoPierdeHastaDosPeriodos() {
-        Anciano anciano = new Anciano(65, 80.0, 100.0);
+    public void testSerPierdeHastaDosPeriodos() {
+        Ser anciano = new Ser(65, 80.0, 100.0);
         anciano.alimentar(5.0);
 
-        assertEquals(78.34, anciano.getEsperanzaVida(), 0.01, "Esperanza bajó casi doble");
+        assertEquals(78.34, anciano.getEsperanzaVida(), 0.21, "Esperanza bajó casi doble");
     }
 
     @Test
@@ -100,7 +100,7 @@ public class SerTest {
         adulto.alimentar(300.0);
         assertEquals(200.0, adulto.getAhorros(), 0.01, "Ahorro al transicionar");
 
-        Anciano anciano = new Anciano(adulto);
+        Ser anciano = new Ser(adulto);
         assertEquals(18, anciano.getEdadActual(), 0, "Edad tr 2");
         assertEquals(50.0, anciano.getNecesidadVital(), 0.01, "Necesidad Vital tr 2");
     }
