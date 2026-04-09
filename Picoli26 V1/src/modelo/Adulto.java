@@ -21,9 +21,6 @@ public class Adulto extends Ser {
 
     @Override
     public void alimentar(double cantidadEntregada) {
-        if (!vivo)
-            return;
-
         double consumido = 0;
 
         if (empleado) {

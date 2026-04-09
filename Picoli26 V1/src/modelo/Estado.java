@@ -1,6 +1,7 @@
 package modelo;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Estado {
 	// atributos sobre desarrollo
@@ -9,11 +10,20 @@ public class Estado {
 	private final double edadJubilacion = 65;
 	private final double edadMadurez = 18;
 	private final double necesidadVital=100;
+	
 	// poblacion
 	private ArrayList<Menor> menores;
 	private ArrayList<Adulto> trabajadores;
 	private ArrayList<Adulto> parados;
 	private ArrayList<Ser> ancianos;
+	
+	public Estado() {
+		super();
+		menores=new ArrayList<Menor>();
+		trabajadores=new ArrayList<Adulto>();
+		parados=new ArrayList<Adulto>();
+		ancianos=new ArrayList<Ser>();
+	}
 
 	////////////////////////////////////////////////////
 	/**
@@ -37,26 +47,6 @@ public class Estado {
 			capital -= menor.getNecesidadVital();
 			menor.alimentar(menor.getNecesidadVital());
 		}
-		//...
-		//3 envejecer
-//		for (Ser ser : menores) {
-//			ser.envejecer();
-//		}
-//		for (Ser ser : ancianos) {
-//			ser.envejecer();
-//		}
-//		for (Ser ser : trabajadores) {
-//			ser.envejecer();
-//		}
-//		for (Ser ser : parados) {
-//			ser.envejecer();
-//		}
-//		envejecer(menores);
-//		envejecer(ancianos);
-//		envejecer(trabajadores);
-//		envejecer(parados);
-//		envejecerDos(menores,trabajadores,parados,ancianos);
-		////Otra forma de envejecer
 		ArrayList<Ser> poblacion=new ArrayList<Ser>();
 		poblacion.addAll(menores);
 		poblacion.addAll(trabajadores);
@@ -69,6 +59,39 @@ public class Estado {
 		// en ese caso quitarle los ahorros (se suman al capital)
 		// quitarlo de la lista correspondiente y añadir al nuevo
 		// anciano a la lista de los mismos
+		jubila(parados,trabajadores);
+		//Enterrar a los muertos
+		enterrar(poblacion);
+	}
+
+	private void enterrar(ArrayList<Ser> poblacion) {
+		Iterator<Ser> iterator = poblacion.iterator();
+		while(iterator.hasNext()) {
+			Ser ser = iterator.next();
+			if(!ser.isVivo()) {
+				iterator.remove();
+			}
+		}
+	}
+
+	private void jubila(ArrayList<Adulto>... listas) {
+		for (ArrayList<Adulto> lista : listas) {
+			Iterator<Adulto> iterator = lista.iterator();
+			while(iterator.hasNext()) {
+				//sustituye al for
+//			for (Adulto adulto : lista) {
+				Adulto adulto = iterator.next();
+				if(isAnciano(adulto)){
+					this.capital+=adulto.getAhorros();
+					iterator.remove();
+					ancianos.add(new Ser(adulto));
+				}
+			}
+		}
+	}
+	
+	private boolean isAnciano(Adulto adulto) {
+		return adulto.getEdadActual()>=edadJubilacion;
 	}
 
 	private void envejecerDos(ArrayList<? extends Ser>... listas) {
@@ -87,4 +110,22 @@ public class Estado {
 	public void abrirPeriodo(double porcentajeIncrementoProduccion) {
 
 	}
+
+	public ArrayList<Menor> getMenores() {
+		return menores;
+	}
+
+	public ArrayList<Adulto> getTrabajadores() {
+		return trabajadores;
+	}
+
+	public ArrayList<Adulto> getParados() {
+		return parados;
+	}
+
+	public ArrayList<Ser> getAncianos() {
+		return ancianos;
+	}
+
+	
 }

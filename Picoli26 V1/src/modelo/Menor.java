@@ -10,9 +10,6 @@ public class Menor extends Ser {
 
     @Override
     public void alimentar(double cantidadEntregada) {
-        if (!vivo)
-            return;
-
         if (cantidadEntregada >= necesidadVital) {
             factorDesarrollo += 5.55;
         } else if (cantidadEntregada > 0) {

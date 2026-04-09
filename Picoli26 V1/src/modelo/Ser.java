@@ -4,20 +4,17 @@ public class Ser {
     protected int edadActual;
     protected double esperanzaVida;
     protected double necesidadVital;
-    protected boolean vivo;
 
     public Ser(double esperanzaVida, double necesidadVital) {
         this.edadActual = 0;
         this.esperanzaVida = esperanzaVida;
         this.necesidadVital = necesidadVital;
-        this.vivo = true;
     }
 
     public Ser(int edadActual, double esperanzaVida, double necesidadVital) {
         this.edadActual = edadActual;
         this.esperanzaVida = esperanzaVida;
         this.necesidadVital = necesidadVital;
-        this.vivo = true;
     }
 
     public Ser(Adulto adulto) {
@@ -25,18 +22,10 @@ public class Ser {
 	}
 
 	public void envejecer() {
-        if (!vivo)
-            return;
         edadActual++;
-        if (edadActual > esperanzaVida) {
-            vivo = false;
-        }
     }
 
     public  void alimentar(double cantidadEntregada) {
-    	 if (!vivo)
-             return;
-
          double proporcion = cantidadEntregada / necesidadVital;
 
          if (proporcion < 1.0) {
@@ -64,11 +53,8 @@ public class Ser {
         return necesidadVital;
     }
 
-    public boolean isVivo() {
-        return vivo;
-    }
+	public boolean isVivo() {
+		return edadActual<esperanzaVida;
+	}
 
-    public void setVivo(boolean vivo) {
-        this.vivo = vivo;
-    }
 }
