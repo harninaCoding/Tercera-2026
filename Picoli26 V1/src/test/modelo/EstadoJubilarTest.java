@@ -48,7 +48,7 @@ class EstadoJubilarTest {
 
 	@Test
 	void testJubilar() {
-		estado.getParados().add(adulto2);
+		estado.getParados().add(adulto);
 		int antesDeJubilar = estado.getParados().size();
 		int cantidadDeAncianos = estado.getAncianos().size();
 		estado.cerrarPeriodo();
