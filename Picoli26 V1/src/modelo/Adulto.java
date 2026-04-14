@@ -53,6 +53,9 @@ public class Adulto extends Ser {
             esperanzaVida -= proporcionAfectada; // maximo de 1 periodo reducido por vez
         }
     }
+    public double getNecesidad(){
+	    return necesidadVital - Math.min(ahorros, necesidadVital);
+	}
 
     public double entregarAhorros() {
         double ahorrosEntregados = ahorros;
