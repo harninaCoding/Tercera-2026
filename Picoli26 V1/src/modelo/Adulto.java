@@ -2,22 +2,17 @@ package modelo;
 
 public class Adulto extends Ser {
     private double ahorros;
-    private boolean empleado;
 
     // Constructor para transición desde etapa Menor
     public Adulto(Menor menor, boolean empleado, double necesidadVital) {
         super(menor.getEdadActual(), menor.getEsperanzaVida(), necesidadVital);
         this.ahorros = 0;
-        this.empleado = empleado;
     }
 
     // Constructor general / directo
-    public Adulto(int edadActual, double esperanzaVida, double necesidadVital, double ahorrosIniciales,
-            boolean empleado) {
+    public Adulto(int edadActual, double esperanzaVida, double necesidadVital, double ahorrosIniciales) {
         super(edadActual, esperanzaVida, necesidadVital);
         this.ahorros = ahorrosIniciales;
-        this.empleado = empleado;
-    }
 
     @Override
     public void alimentar(double cantidadEntregada) {

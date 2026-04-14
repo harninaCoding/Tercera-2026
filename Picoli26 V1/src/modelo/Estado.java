@@ -10,19 +10,30 @@ public class Estado {
 	private double cantidadProducidaPorTrabajador;
 	private final double edadJubilacion = 65;
 	private final double edadMadurez = 18;
+	private final double necesidadVitalBase=100;
 
 	// poblacion
-	private ArrayList<Menor> menores;
-	private ArrayList<Adulto> trabajadores;
-	private ArrayList<Adulto> parados;
-	private ArrayList<Ser> ancianos;
+	private Sector<Menor> menores;
+	private Sector<Adulto> trabajadores;
+	private Sector<Adulto> parados;
+	private Sector<Ser> ancianos;
 
 	public Estado() {
 		super();
-		menores = new ArrayList<Menor>();
-		trabajadores = new ArrayList<Adulto>();
-		parados = new ArrayList<Adulto>();
-		ancianos = new ArrayList<Ser>();
+		menores = new Sector<Menor>(this.necesidadVitalBase,1,.45);
+		trabajadores = new Sector<Adulto>(this.necesidadVitalBase,2,1);
+		ancianos = new Sector<Ser>(this.necesidadVitalBase/2,1,.3);
+		// Sobreescritura de un metodo par aun objeto especial
+		parados = new Sector<Adulto>(this.necesidadVitalBase,1,1) {
+			@Override
+			public double pago(double deficit) {
+				for (Ser miembro : getMiembros()) {
+					double necesidad = miembro.getNecesidad();
+					capital -= necesidad;
+					miembro.alimentar(necesidad);
+				}
+			}
+		};
 	}
 
 	////////////////////////////////////////////////////
@@ -37,53 +48,8 @@ public class Estado {
 		double totalProducido = trabajadores.size() * cantidadProducidaPorTrabajador;
 		this.capital += totalProducido;
 		// 2 pagar a los seres
-		// Antes de refactorizar
-		double presupuesto = calcularPresupuesto();
-		double deficit = obtenerDeficit(presupuesto);
-		double pagoSector = menor.getCantidad();
-		if (deficit < 0) {
-			double presupuestoMenores = menores.size() * menor.getCantidad();
-			double presupuestoCorregidoMaximo = presupuestoMenores * .45;
-			double presupuestoMenoresReal = presupuestoMenores + deficit;
-			double min = Math.max(presupuestoCorregidoMaximo, presupuestoMenoresReal);
-			deficit += presupuestoMenores - min;
-			pagoSector = min / menores.size();
-		}
-		for (Menor menor : menores) {
-			capital -= pagoSector;
-			menor.alimentar(pagoSector);
-		}
-		pagoSector = anciano.getCantidad();
-		if (deficit < 0) {
-			double presupuestoAncianos = ancianos.size() * anciano.getCantidad();
-			double presupuestoCorregidoMaximo = presupuestoAncianos * .3;
-			double presupuestoAncianosReal = presupuestoAncianos + deficit;
-			double min = Math.max(presupuestoCorregidoMaximo, presupuestoAncianosReal);
-			deficit += presupuestoAncianos - min;
-			pagoSector = min / ancianos.size();
-		}
-		for (Ser anciano : ancianos) {
-			capital -= pagoSector;
-			anciano.alimentar(pagoSector);
-		}
-		pagoSector = trabajador.getCantidad();
-		if (deficit < 0) {
-			double presupuestoTrabajadores = trabajadores.size() * trabajador.getCantidad();
-			double presupuestoCorregidoMaximo = presupuestoTrabajadores * .5;
-			double presupuestoTrabajadoresReal = presupuestoTrabajadores + deficit;
-			double min = Math.max(presupuestoCorregidoMaximo, presupuestoTrabajadoresReal);
-			deficit += presupuestoTrabajadores - min;
-			pagoSector = min / trabajadores.size();
-		}
-		for (Adulto trabajador : trabajadores) {
-			capital -= pagoSector;
-			trabajador.alimentar(pagoSector);
-		}
-		for (Adulto parado : parados) {
-			double necesidad = parado.getNecesidad();
-			capital -= necesidad;
-			parado.alimentar(necesidad);
-		}
+		pagar(menores, ancianos,trabajadores, parados);
+		
 
 		// Tendria que preguntarme si puedo pagarlo
 		ArrayList<Ser> poblacion = new ArrayList<Ser>();
@@ -94,67 +60,23 @@ public class Estado {
 		envejecer(poblacion);
 		jubila(parados, trabajadores);
 		enterrar(menores, parados, trabajadores, ancianos);
-		capital+=deficit;
 	}
 
+	private void pagar(Sector<? extends Ser>...sector) {
+		double presupuestoMaximo = calcularPresupuesto();
+		double deficit = capital - presupuestoMaximo;
+		for (Sector<? extends Ser> poblacion : sector) {
+			double pagoReal =poblacion.pago(deficit);
+			capital -= pagoReal;
+			deficit += presupuestoMaximo - pagoReal;
+		}
+		capital += deficit;
+	}
 	private boolean hayDeficit(double presupuesto) {
 		return capital < presupuesto;
 	}
 
-	private void pagarSeres(ArrayList<? extends Ser>... sector) {
-		Presupuesto presupuesto = new Presupuesto(menores.size(), parados.size(), trabajadores.size(), ancianos.size());
-		double deficit = obtenerDeficit(presupuesto.calcularPresupuesto());
-		////////////////////////////////// Pago a menores
-		double pagoSector = menor.getCantidad();
-		double presupuestoMenores = presupuesto.getPresupuestoMenores();
-		if (deficit < 0) {
-			double presupuestoCorregidoMaximo = presupuestoMenores * .45;
-			double presupuestoMenoresReal = presupuestoMenores + deficit;
-			double min = Math.max(presupuestoCorregidoMaximo, presupuestoMenoresReal);
-			deficit += presupuestoMenores - min;
-			pagoSector = min / menores.size();
-		}
-		for (Menor menor : menores) {
-			capital -= pagoSector;
-			menor.alimentar(pagoSector);
-		}
-		////////////////////////////////// Pago a ancianos
-		pagoSector = anciano.getCantidad();
-		double presupuestoAncianos = presupuesto.getPresupuestoAncianos();
-		if (deficit < 0) {
-			double presupuestoCorregidoMaximo = presupuestoAncianos * .3;
-			double presupuestoAncianosReal = presupuestoAncianos + deficit;
-			double min = Math.max(presupuestoCorregidoMaximo, presupuestoAncianosReal);
-			deficit += presupuestoAncianos - min;
-			pagoSector = min / ancianos.size();
-		}
-		for (Ser anciano : ancianos) {
-			capital -= pagoSector;
-			anciano.alimentar(pagoSector);
-		}
-		////////////////////////// Pago a trabajadores
-		pagoSector = trabajador.getCantidad();
-		double presupuestoTrabajadores = presupuesto.getPresupuestoTrabajadores();
-		if (deficit < 0) {
-			double presupuestoCorregidoMaximo = presupuestoTrabajadores * .3;
-			double presupuestoTrabajadoresReal = presupuestoTrabajadores + deficit;
-			double min = Math.max(presupuestoCorregidoMaximo, presupuestoTrabajadoresReal);
-			deficit += presupuestoTrabajadores - min;
-			pagoSector = min / trabajadores.size();
-		}
-		for (Adulto trabajador : trabajadores) {
-			capital -= pagoSector;
-			trabajador.alimentar(pagoSector);
-		}
-		//////////////////////// Pago a parados
-		for (Adulto parado : parados) {
-			double necesidad = parado.getNecesidad();
-			capital -= necesidad;
-			parado.alimentar(necesidad);
-		}
-		capital += deficit;
-	}
-
+	
 	private double obtenerDeficit(double presupuesto) {
 		return capital - presupuesto;
 	}
@@ -198,15 +120,6 @@ public class Estado {
 
 	private boolean isAnciano(Adulto adulto) {
 		return adulto.getEdadActual() >= edadJubilacion;
-	}
-
-	private void envejecerDos(ArrayList<? extends Ser>... listas) {
-		for (ArrayList<? extends Ser> lista : listas) {
-			for (Ser ser : lista) {
-				ser.envejecer();
-			}
-		}
-
 	}
 
 	private void envejecer(ArrayList<? extends Ser> lista) {
