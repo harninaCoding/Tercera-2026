@@ -20,20 +20,33 @@ public class Estado {
 
 	public Estado() {
 		super();
-		menores = new Sector<Menor>(this.necesidadVitalBase,1,.45);
-		trabajadores = new Sector<Adulto>(this.necesidadVitalBase,2,1);
-		ancianos = new Sector<Ser>(this.necesidadVitalBase/2,1,.3);
+		menores = new Sector<Menor>(menor);
+		trabajadores = new Sector<Adulto>(trabajador);
+		ancianos = new Sector<Ser>(anciano);
 		// Sobreescritura de un metodo par aun objeto especial
-		parados = new Sector<Adulto>(this.necesidadVitalBase,1,1) {
+		parados = new Sector<Adulto>(parado) {
 			@Override
 			public double pago(double deficit) {
-				for (Ser miembro : getMiembros()) {
+				double consumido=0;
+				for (Adulto miembro : getMiembros()) {
 					double necesidad = miembro.getNecesidad();
-					capital -= necesidad;
+					consumido -= necesidad;
 					miembro.alimentar(necesidad);
 				}
+				return consumido;
 			}
 		};
+	}
+
+	public void abrirPeriodo(double porcentajeIncrementoProduccion) {
+		// 1 calcular la cantidad que debe producir el estado segun el incremento (puede
+//		// ser una cantidad menor)
+//		double objetivoProduccion = calcularCantidadAProducir(porcentajeIncrementoProduccion);
+//		// 2 Contratar o despedir a adultos segun sea la necesidad
+//		gestionarEmpleos(objetivoProduccion);
+//		// 3 decidir los nacimientos en funcion de cuantas defunciones, y otras cosas,
+//		// hayan pasado en el periodo anterior
+//		gestionarNacimientos();
 	}
 
 	////////////////////////////////////////////////////
@@ -49,23 +62,22 @@ public class Estado {
 		this.capital += totalProducido;
 		// 2 pagar a los seres
 		pagar(menores, ancianos,trabajadores, parados);
-		
-
 		// Tendria que preguntarme si puedo pagarlo
 		ArrayList<Ser> poblacion = new ArrayList<Ser>();
-		poblacion.addAll(menores);
-		poblacion.addAll(trabajadores);
-		poblacion.addAll(parados);
-		poblacion.addAll(ancianos);
+		poblacion.addAll(menores.getMiembros());
+		poblacion.addAll(trabajadores.getMiembros());
+		poblacion.addAll(parados.getMiembros());
+		poblacion.addAll(ancianos.getMiembros());
 		envejecer(poblacion);
-		jubila(parados, trabajadores);
-		enterrar(menores, parados, trabajadores, ancianos);
+		jubila(parados.getMiembros(), trabajadores.getMiembros());
+		enterrar(menores.getMiembros(), parados.getMiembros(), trabajadores.getMiembros(), ancianos.getMiembros());
 	}
 
 	private void pagar(Sector<? extends Ser>...sector) {
-		double presupuestoMaximo = calcularPresupuesto();
-		double deficit = capital - presupuestoMaximo;
+		double deficit =0;
 		for (Sector<? extends Ser> poblacion : sector) {
+			double presupuestoMaximo=poblacion.getTotalPago();
+			deficit=capital-presupuestoMaximo;
 			double pagoReal =poblacion.pago(deficit);
 			capital -= pagoReal;
 			deficit += presupuestoMaximo - pagoReal;
@@ -82,10 +94,10 @@ public class Estado {
 	}
 
 	private double calcularPresupuesto() {
-		double presupuestoMenores = menores.size() * menor.getCantidad();
-		double presupuestoAncianos = ancianos.size() * anciano.getCantidad();
-		double prespuestoParados = parados.size() * parado.getCantidad();
-		double presupuestoTrabajadores = trabajadores.size() * trabajador.getCantidad();
+		double presupuestoMenores = menores.size() * menor.getPago();
+		double presupuestoAncianos = ancianos.size() * anciano.getPago();
+		double prespuestoParados = parados.size() * parado.getPago();
+		double presupuestoTrabajadores = trabajadores.size() * trabajador.getPago();
 		return prespuestoParados + presupuestoAncianos + presupuestoMenores + presupuestoTrabajadores;
 	}
 
@@ -112,7 +124,7 @@ public class Estado {
 				if (isAnciano(adulto)) {
 					this.capital += adulto.getAhorros();
 					iterator.remove();
-					ancianos.add(new Ser(adulto));
+					ancianos.getMiembros().add(new Ser(adulto));
 				}
 			}
 		}
@@ -128,24 +140,27 @@ public class Estado {
 		}
 	}
 
-	public void abrirPeriodo(double porcentajeIncrementoProduccion) {
-
-	}
-
+	
 	public ArrayList<Menor> getMenores() {
-		return menores;
+		return menores.getMiembros();
 	}
 
 	public ArrayList<Adulto> getTrabajadores() {
-		return trabajadores;
+		return trabajadores.getMiembros();
 	}
 
 	public ArrayList<Adulto> getParados() {
-		return parados;
+		return parados.getMiembros();
 	}
 
 	public ArrayList<Ser> getAncianos() {
-		return ancianos;
+		return ancianos.getMiembros();
+	}
+	public double getCapital() {
+		return capital;
 	}
 
+	public void setCapital(double capital) {
+		this.capital = capital;
+	}
 }

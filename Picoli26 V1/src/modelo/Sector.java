@@ -3,13 +3,16 @@ package modelo;
 import java.util.ArrayList;
 
 public class Sector<T extends Ser> {
-	
-
 	private ArrayList<T> miembros;
 	private final double necesidadVital;
 	private final double pago;
 	private final double reduccionMaxima;
 
+	//usando un tipo complejo (mas control, mas acoplamiento)
+	public Sector(TipoPago tipo) {
+		this(tipo.getNecesidadVital(),tipo.getPago(),tipo.getReduccionMaxima());
+	}
+	//Con tipos primitivos (menos control pero menos acoplamiento)
 	public Sector(double necesidadVital, double pago, double reduccionMaxima) {
 		super();
 		miembros = new ArrayList<>();
@@ -20,13 +23,12 @@ public class Sector<T extends Ser> {
 	
 	public double pago(double deficit) {
 		double pagoSector = this.pago;
-		double pagoTotalPorSector=0;
+		double pagoTotalPorSector = miembros.size() * pagoSector;;
 		if (deficit < 0) {
-			double presupuestoSector = miembros.size() * pagoSector;
-			double presupuestoCorregidoMaximo = presupuestoSector * reduccionMaxima;
-			double presupuestoSectorReal = presupuestoSector + deficit;
+			double presupuestoCorregidoMaximo = pagoTotalPorSector * reduccionMaxima;
+			double presupuestoSectorReal = pagoTotalPorSector + deficit;
 			pagoTotalPorSector = Math.max(presupuestoCorregidoMaximo, presupuestoSectorReal);
-			deficit += presupuestoSector - pagoTotalPorSector;
+			deficit += pagoTotalPorSector - pagoTotalPorSector;
 			pagoSector = pagoTotalPorSector / miembros.size();
 		}
 		for (Ser poblador : miembros) {
@@ -42,5 +44,7 @@ public class Sector<T extends Ser> {
 		return miembros;
 	}
 	
-	
+	public double getTotalPago() {
+		return miembros.size()*necesidadVital;
+	}
 }

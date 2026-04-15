@@ -22,8 +22,8 @@ class EstadoJubilarTest {
 	void beforeEach() {
 		estado=new Estado();
 		necesidadVital = 100;
-		adulto=new Adulto(64, 90, necesidadVital, 0, false);
-		adulto2=new Adulto(62, 63, necesidadVital, 0, false);
+		adulto=new Adulto(64, 90, necesidadVital, 0);
+		adulto2=new Adulto(62, 63, necesidadVital, 0);
 	}
 
 	@Test
