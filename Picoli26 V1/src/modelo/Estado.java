@@ -5,12 +5,29 @@ import java.util.Iterator;
 import static modelo.TipoPago.*;
 
 public class Estado {
+	class Parados<Ser> extends Sector {
+		public Parados(double necesidadVital, double pago, double reduccionMaxima) {
+			super(necesidadVital, pago, reduccionMaxima);
+		}
+
+		@Override
+		public double pago(double deficit) {
+			for (Ser miembro : getMiembros()) {
+				double necesidad = miembro.getNecesidad();
+				capital -= necesidad;
+				miembro.alimentar(necesidad);
+			}
+		}
+	};
+
+	}
+
 	// atributos sobre desarrollo
 	private double capital;
 	private double cantidadProducidaPorTrabajador;
 	private final double edadJubilacion = 65;
 	private final double edadMadurez = 18;
-	private final double necesidadVitalBase=100;
+	private final double necesidadVitalBase = 100;
 
 	// poblacion
 	private Sector<Menor> menores;
@@ -24,16 +41,7 @@ public class Estado {
 		trabajadores = new Sector<Adulto>(this.necesidadVitalBase,2,1);
 		ancianos = new Sector<Ser>(this.necesidadVitalBase/2,1,.3);
 		// Sobreescritura de un metodo par aun objeto especial
-		parados = new Sector<Adulto>(this.necesidadVitalBase,1,1) {
-			@Override
-			public double pago(double deficit) {
-				for (Ser miembro : getMiembros()) {
-					double necesidad = miembro.getNecesidad();
-					capital -= necesidad;
-					miembro.alimentar(necesidad);
-				}
-			}
-		};
+		parados = new Parados<Adulto>(this.necesidadVitalBase,1,1);
 	}
 
 	////////////////////////////////////////////////////
@@ -48,8 +56,7 @@ public class Estado {
 		double totalProducido = trabajadores.size() * cantidadProducidaPorTrabajador;
 		this.capital += totalProducido;
 		// 2 pagar a los seres
-		pagar(menores, ancianos,trabajadores, parados);
-		
+		pagar(menores, ancianos, trabajadores, parados);
 
 		// Tendria que preguntarme si puedo pagarlo
 		ArrayList<Ser> poblacion = new ArrayList<Ser>();
@@ -62,21 +69,21 @@ public class Estado {
 		enterrar(menores, parados, trabajadores, ancianos);
 	}
 
-	private void pagar(Sector<? extends Ser>...sector) {
+	private void pagar(Sector<? extends Ser>... sector) {
 		double presupuestoMaximo = calcularPresupuesto();
 		double deficit = capital - presupuestoMaximo;
 		for (Sector<? extends Ser> poblacion : sector) {
-			double pagoReal =poblacion.pago(deficit);
+			double pagoReal = poblacion.pago(deficit);
 			capital -= pagoReal;
 			deficit += presupuestoMaximo - pagoReal;
 		}
 		capital += deficit;
 	}
+
 	private boolean hayDeficit(double presupuesto) {
 		return capital < presupuesto;
 	}
 
-	
 	private double obtenerDeficit(double presupuesto) {
 		return capital - presupuesto;
 	}
