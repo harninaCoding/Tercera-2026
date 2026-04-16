@@ -1,16 +1,23 @@
 package modelo;
 
+import static modelo.TipoPago.anciano;
+import static modelo.TipoPago.menor;
+import static modelo.TipoPago.parado;
+import static modelo.TipoPago.trabajador;
+
+import java.util.AbstractCollection;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
-import static modelo.TipoPago.*;
+import java.util.PriorityQueue;
 
 public class Estado {
 	// atributos sobre desarrollo
-	private double capital;
+	private double capital = 0;
 	private double cantidadProducidaPorTrabajador;
 	private final double edadJubilacion = 65;
 	private final double edadMadurez = 18;
-	private final double necesidadVitalBase=100;
+	private final double necesidadVitalBase = 100;
 
 	// poblacion
 	private Sector<Menor> menores;
@@ -18,16 +25,39 @@ public class Estado {
 	private Sector<Adulto> parados;
 	private Sector<Ser> ancianos;
 
+	// prduccion
+	private double totalDemandado = 0;
+
 	public Estado() {
 		super();
-		menores = new Sector<Menor>(menor);
-		trabajadores = new Sector<Adulto>(trabajador);
-		ancianos = new Sector<Ser>(anciano);
+		Comparator<Adulto> comparador = new Comparator<Adulto>() {
+			@Override
+			public int compare(Adulto o1, Adulto o2) {
+				return o1.getPeriodosEnEstado() - o2.getPeriodosEnEstado();
+			}
+		};
+		IObtenedorPrimerElemento<? extends Ser> obtenedorArrayList=new IObtenedorPrimerElemento<Adulto>() {
+			
+			@Override
+			public Adulto getFirst(AbstractCollection<Adulto> miembros) {
+				return ((ArrayList<Adulto>)miembros).getFirst();
+			}
+		};
+		IObtenedorPrimerElemento<Adulto> obtenedorPriority=new IObtenedorPrimerElemento<Adulto>() {
+			
+			@Override
+			public Adulto getFirst(AbstractCollection<Adulto> miembros) {
+				return ((PriorityQueue<Adulto>)miembros).poll();
+			}
+		};
+		menores = new Sector<Menor>(menor, new ArrayList<Menor>(),(IObtenedorPrimerElemento<Menor>) obtenedorArrayList);
+		trabajadores = new Sector<Adulto>(trabajador, new PriorityQueue<Adulto>(comparador),obtenedorPriority);
+		ancianos = new Sector<Ser>(anciano, new ArrayList<Ser>(),(IObtenedorPrimerElemento<Ser>) obtenedorArrayList);
 		// Sobreescritura de un metodo par aun objeto especial
-		parados = new Sector<Adulto>(parado) {
+		parados = new Sector<Adulto>(parado, new PriorityQueue<Adulto>(comparador),obtenedorPriority) {
 			@Override
 			public double pago(double deficit) {
-				double consumido=0;
+				double consumido = 0;
 				for (Adulto miembro : getMiembros()) {
 					double necesidad = miembro.getNecesidad();
 					consumido -= necesidad;
@@ -38,10 +68,11 @@ public class Estado {
 		};
 	}
 
-	public void abrirPeriodo(double porcentajeIncrementoProduccion) {
+	public void abrirPeriodo(double porcentajeIncrementoDemanda) {
 		// 1 calcular la cantidad que debe producir el estado segun el incremento (puede
 //		// ser una cantidad menor)
 //		double objetivoProduccion = calcularCantidadAProducir(porcentajeIncrementoProduccion);
+		totalDemandado *= 1 + porcentajeIncrementoDemanda;
 //		// 2 Contratar o despedir a adultos segun sea la necesidad
 //		gestionarEmpleos(objetivoProduccion);
 //		// 3 decidir los nacimientos en funcion de cuantas defunciones, y otras cosas,
@@ -61,7 +92,7 @@ public class Estado {
 		double totalProducido = trabajadores.size() * cantidadProducidaPorTrabajador;
 		this.capital += totalProducido;
 		// 2 pagar a los seres
-		pagar(menores, ancianos,trabajadores, parados);
+		pagar(menores, ancianos, trabajadores, parados);
 		// Tendria que preguntarme si puedo pagarlo
 		ArrayList<Ser> poblacion = new ArrayList<Ser>();
 		poblacion.addAll(menores.getMiembros());
@@ -73,22 +104,22 @@ public class Estado {
 		enterrar(menores.getMiembros(), parados.getMiembros(), trabajadores.getMiembros(), ancianos.getMiembros());
 	}
 
-	private void pagar(Sector<? extends Ser>...sector) {
-		double deficit =0;
+	private void pagar(Sector<? extends Ser>... sector) {
+		double deficit = 0;
 		for (Sector<? extends Ser> poblacion : sector) {
-			double presupuestoMaximo=poblacion.getTotalPago();
-			deficit=capital-presupuestoMaximo;
-			double pagoReal =poblacion.pago(deficit);
+			double presupuestoMaximo = poblacion.getTotalPago();
+			deficit = capital - presupuestoMaximo;
+			double pagoReal = poblacion.pago(deficit);
 			capital -= pagoReal;
 			deficit += presupuestoMaximo - pagoReal;
 		}
 		capital += deficit;
 	}
+
 	private boolean hayDeficit(double presupuesto) {
 		return capital < presupuesto;
 	}
 
-	
 	private double obtenerDeficit(double presupuesto) {
 		return capital - presupuesto;
 	}
@@ -102,8 +133,8 @@ public class Estado {
 	}
 
 	// Pendiente para el lunes 13 abril robar a los muertos
-	private void enterrar(ArrayList<? extends Ser>... listas) {
-		for (ArrayList<? extends Ser> poblacion : listas) {
+	private void enterrar(AbstractCollection<? extends Ser>... listas) {
+		for (AbstractCollection<? extends Ser> poblacion : listas) {
 			Iterator<? extends Ser> iterator = poblacion.iterator();
 			while (iterator.hasNext()) {
 				Ser ser = iterator.next();
@@ -114,8 +145,8 @@ public class Estado {
 		}
 	}
 
-	private void jubila(ArrayList<Adulto>... listas) {
-		for (ArrayList<Adulto> lista : listas) {
+	private void jubila(AbstractCollection<Adulto>... listas) {
+		for (AbstractCollection<Adulto> lista : listas) {
 			Iterator<Adulto> iterator = lista.iterator();
 			while (iterator.hasNext()) {
 				// sustituye al for
@@ -140,22 +171,22 @@ public class Estado {
 		}
 	}
 
-	
-	public ArrayList<Menor> getMenores() {
+	public AbstractCollection<Menor> getMenores() {
 		return menores.getMiembros();
 	}
 
-	public ArrayList<Adulto> getTrabajadores() {
+	public AbstractCollection<Adulto> getTrabajadores() {
 		return trabajadores.getMiembros();
 	}
 
-	public ArrayList<Adulto> getParados() {
+	public AbstractCollection<Adulto> getParados() {
 		return parados.getMiembros();
 	}
 
-	public ArrayList<Ser> getAncianos() {
+	public AbstractCollection<Ser> getAncianos() {
 		return ancianos.getMiembros();
 	}
+
 	public double getCapital() {
 		return capital;
 	}

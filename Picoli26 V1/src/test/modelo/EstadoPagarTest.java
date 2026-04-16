@@ -3,13 +3,16 @@ package test.modelo;
 import static modelo.TipoPago.menor;
 import static org.junit.Assert.assertEquals;
 
+import java.util.AbstractCollection;
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import modelo.Estado;
 import modelo.Menor;
+import modelo.Ser;
 import modelo.OM.SeresManager;
 
 class EstadoPagarTest {
@@ -18,10 +21,14 @@ class EstadoPagarTest {
 	int cantidadMenores = 10;
 	double cantidadTotalPagoAlSector;
 	double factorDesarrollo = 5.55;
-	ArrayList<Menor> menores;
+	AbstractCollection<Menor> menores;
 	
 	@BeforeEach
 	void before() {
+//		ArrayList<Ser> seres;
+//		PriorityQueue<Ser> otros;
+//		seres.getFirst();
+//		otros.poll();
 		estado = new Estado();
 		menores = estado.getMenores();
 		menores.addAll(seresManager.getMenores(cantidadMenores));
