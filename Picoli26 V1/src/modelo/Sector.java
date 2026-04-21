@@ -2,20 +2,19 @@ package modelo;
 
 import java.util.AbstractCollection;
 
-public class Sector<T extends Ser>  {
+public abstract class Sector<T extends Ser>  {
 	private AbstractCollection<T> miembros;
 	private final double necesidadVital;
 	private final double pago;
 	private final double reduccionMaxima;
-	IObtenedorPrimerElemento<T> obtenedor;
 
 	//usando un tipo complejo (mas control, mas acoplamiento)
-	public Sector(TipoPago tipo,AbstractCollection<T> miembros,IObtenedorPrimerElemento<T> obtener) {
-		this(tipo.getNecesidadVital(),tipo.getPago(),tipo.getReduccionMaxima(), miembros,obtener);
+	public Sector(TipoPago tipo,AbstractCollection<T> miembros) {
+		this(tipo.getNecesidadVital(),tipo.getPago(),tipo.getReduccionMaxima(), miembros);
 	}
 	
 	//Con tipos primitivos (menos control pero menos acoplamiento)
-	public Sector(double necesidadVital, double pago, double reduccionMaxima,AbstractCollection<T> miembros,IObtenedorPrimerElemento<T> obtener) {
+	public Sector(double necesidadVital, double pago, double reduccionMaxima,AbstractCollection<T> miembros) {
 		super();
 		//Componente
 //		miembros = new ArrayList<>();
@@ -24,12 +23,9 @@ public class Sector<T extends Ser>  {
 		this.necesidadVital = necesidadVital;
 		this.pago = pago;
 		this.reduccionMaxima = reduccionMaxima;
-		this.obtenedor=obtener;
 	}
 	
-	public T getFirst() {
-		return obtenedor.getFirst(miembros);
-	}
+	public abstract T getFirst();
 	
 	public double pago(double deficit) {
 		double pagoSector = this.pago;

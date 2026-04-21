@@ -30,42 +30,11 @@ public class Estado {
 
 	public Estado() {
 		super();
-		Comparator<Adulto> comparador = new Comparator<Adulto>() {
-			@Override
-			public int compare(Adulto o1, Adulto o2) {
-				return o1.getPeriodosEnEstado() - o2.getPeriodosEnEstado();
-			}
-		};
-		IObtenedorPrimerElemento<? extends Ser> obtenedorArrayList=new IObtenedorPrimerElemento<Adulto>() {
-			
-			@Override
-			public Adulto getFirst(AbstractCollection<Adulto> miembros) {
-				return ((ArrayList<Adulto>)miembros).getFirst();
-			}
-		};
-		IObtenedorPrimerElemento<Adulto> obtenedorPriority=new IObtenedorPrimerElemento<Adulto>() {
-			
-			@Override
-			public Adulto getFirst(AbstractCollection<Adulto> miembros) {
 				return ((PriorityQueue<Adulto>)miembros).poll();
-			}
-		};
-		menores = new Sector<Menor>(menor, new ArrayList<Menor>(),(IObtenedorPrimerElemento<Menor>) obtenedorArrayList);
-		trabajadores = new Sector<Adulto>(trabajador, new PriorityQueue<Adulto>(comparador),obtenedorPriority);
-		ancianos = new Sector<Ser>(anciano, new ArrayList<Ser>(),(IObtenedorPrimerElemento<Ser>) obtenedorArrayList);
-		// Sobreescritura de un metodo par aun objeto especial
-		parados = new Sector<Adulto>(parado, new PriorityQueue<Adulto>(comparador),obtenedorPriority) {
-			@Override
-			public double pago(double deficit) {
-				double consumido = 0;
-				for (Adulto miembro : getMiembros()) {
-					double necesidad = miembro.getNecesidad();
-					consumido -= necesidad;
-					miembro.alimentar(necesidad);
-				}
-				return consumido;
-			}
-		};
+		menores = new SectorNoPrioritario<Menor>(menor);
+		trabajadores = new SectorPrioritario<Adulto>(trabajador);
+		ancianos = new SectorNoPrioritario<Ser>(anciano);
+		parados = new SectorPrioritarioParados(parado);
 	}
 
 	public void abrirPeriodo(double porcentajeIncrementoDemanda) {
