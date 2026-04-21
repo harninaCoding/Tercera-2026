@@ -30,7 +30,6 @@ public class Estado {
 
 	public Estado() {
 		super();
-				return ((PriorityQueue<Adulto>)miembros).poll();
 		menores = new SectorNoPrioritario<Menor>(menor);
 		trabajadores = new SectorPrioritario<Adulto>(trabajador);
 		ancianos = new SectorNoPrioritario<Ser>(anciano);
