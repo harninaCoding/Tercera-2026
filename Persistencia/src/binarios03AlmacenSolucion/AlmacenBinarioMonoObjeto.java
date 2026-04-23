@@ -10,11 +10,11 @@ import java.io.IOException;
 import java.util.Optional;
 
 //Vamos a hacer una clases para gestionar objetos (uno) grabado en un fichero
-public class Almacen<T> {
+public class AlmacenBinarioMonoObjeto<T> {
 	private String path;
 	private Conversor<T> conversor;
 	
-	public Almacen(String path, Conversor<T> conversor) {
+	public AlmacenBinarioMonoObjeto(String path, Conversor<T> conversor) {
 		super();
 		this.path = path;
 		this.conversor = conversor;
@@ -43,5 +43,5 @@ public class Almacen<T> {
 			e.printStackTrace();
 		}
 	}
-	
+		
 }

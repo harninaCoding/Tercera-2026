@@ -10,7 +10,7 @@ import java.io.IOException;
 
 import binarios03AlmacenSolucion.Persona;
 
-public class AlmacenPersona implements AlmacenOld<Persona> {
+public class AlmacenPersona implements AlmacenOld<Persona>{
 	private String path;
 
 	public AlmacenPersona(String path) {
@@ -52,6 +52,20 @@ public class AlmacenPersona implements AlmacenOld<Persona> {
 			e.printStackTrace();
 		}
 
+	}
+	
+	@Override
+	public void borrar() {
+		File archivo = new File(path);
+		archivo.delete();
+	}
+
+	@Override
+	public Persona actualizar(Persona t) {
+		File archivo = new File(path);
+		Persona retorno=this.leer();
+		this.grabar(t);
+		return retorno;
 	}
 
 }

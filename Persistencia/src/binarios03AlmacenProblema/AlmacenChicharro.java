@@ -53,4 +53,16 @@ public class AlmacenChicharro implements AlmacenOld<Chicharro> {
 
 	}
 
+	@Override
+	public void borrar() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Chicharro actualizar(Chicharro t) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
