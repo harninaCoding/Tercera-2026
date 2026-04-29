@@ -1,4 +1,4 @@
-package aleatorio04PersitenciaIndice;
+package aleatorio04PersitenciaConClave;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,13 +9,13 @@ import java.util.HashMap;
 import aleatorio04Inicial.ConversorHashMap;
 import binarios03AlmacenSolucion.AlmacenBinarioMonoObjeto;
 
-public class AlmacenAletatorioMultiObjeto<T> implements IAlmacenMultiObjeto<T> {
+public class AlmacenAletatorioMultiObjetoClave<T> implements IAlmacenMultiObjeto<T> {
 	private String pathIndex, pathData;
 	private Conversor<T> conversor;
 	private HashMap<Integer, Long> indice;
 	private AlmacenBinarioMonoObjeto<HashMap<Integer, Long>> almacen;
 
-	public AlmacenAletatorioMultiObjeto(String path, Conversor<T> conversor) {
+	public AlmacenAletatorioMultiObjetoClave(String path, Conversor<T> conversor) {
 		super();
 		this.pathIndex = path + ".index";
 		this.pathData = path + ".data";

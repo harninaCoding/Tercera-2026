@@ -9,8 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
-import binarios03AlmacenSolucion.AlmacenBinarioMonoObjeto;
-
 //Version sin indice
 public class AlmacenBinarioMultiObjetoIndexableMapa<T extends Keyable<K>,K> implements IAlmacenMultiObjetoIndexado<T,K>{
 	private Conversor<T> conversor;
@@ -26,9 +24,13 @@ public class AlmacenBinarioMultiObjetoIndexableMapa<T extends Keyable<K>,K> impl
 		this.conversor = conversor;
 		almacenIndice=
 				new AlmacenBinarioMonoObjeto<HashMap<K, Integer>>(pathIndice, conversorIndice);
+		//leer el hasmap del fichero
+		indice=almacenIndice.leer();
+		//si falla, entonces no tengo hashmap
 		if(indice==null) {
+			//creo un hashmap vacio
 			indice=new HashMap<K, Integer>();
-			//persistir
+			//persistir para evitar inconsistencia entre lo que hay en RAM y lo que hay en archivo
 			almacenIndice.grabar(indice);
 		}
 	}

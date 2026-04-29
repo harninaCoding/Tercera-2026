@@ -20,7 +20,6 @@ public class AlmacenBinarioMultiObjeto<T> implements IAlmacenMultiObjeto<T>{
 		super();
 		this.path = path;
 		this.conversor = conversor;
-		MouseListener nn;
 	}
 	public void grabar(T t) {
 		File archivo = new File(path);

@@ -1,4 +1,4 @@
-package binarios03AlmacenMultiObjetoIndexableMapaV2;
+package aleatorio04PersitenciaConClave;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -7,18 +7,17 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 
-//ConversorXXX significa que es le mecanismo que sabe como gestionar un tipo de objeto en un flujo
 public abstract class ConversorHashMap<K> implements ConversorConClave<K,HashMap<K,Integer>> {
 
 	@Override
-	public void serializar(DataOutputStream grabador, HashMap<K, Integer> t) {
+	public void serializar(DataOutputStream conversor, HashMap<K, Integer> t) {
 		Set<Entry<K, Integer>> entrySet = t.entrySet();
 		try {
 			//primero grabamos el tamano del map
-			grabador.writeInt(t.size());
+			conversor.writeInt(t.size());
 			for (Entry<K, Integer> entry : entrySet) {
-				writeKey(grabador, entry.getKey());
-				grabador.writeInt(entry.getValue());
+				writeKey(conversor, entry.getKey());
+				conversor.writeInt(entry.getValue());
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -33,9 +32,8 @@ public abstract class ConversorHashMap<K> implements ConversorConClave<K,HashMap
 		try {
 			int size = conversor.readInt();
 			for (int i = 0; i < size; i++) {
-				K key = readKey(conversor);
 				Integer valor = conversor.readInt();
-				indice.put(key, valor);
+				indice.put(readKey(conversor), valor);
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

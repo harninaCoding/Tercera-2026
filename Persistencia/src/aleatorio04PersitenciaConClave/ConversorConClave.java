@@ -1,8 +1,9 @@
-package binarios03AlmacenMultiObjetoIndexableMapaV2;
+package aleatorio04PersitenciaConClave;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 
+import binarios03AlmacenSolucion.Conversor;
 
 public interface ConversorConClave<K, T> extends Conversor<T> {
 	public K readKey(DataInput conversor);
