@@ -2,14 +2,6 @@ package modelo;
 
 //Comparable es la comparacion del objeto con otro objeto
 public class Adulto extends Ser implements Comparable<Adulto> {
-	public int getPeriodosEnEstado() {
-		return periodosEnEstado;
-	}
-
-	public void setPeriodosEnEstado(int periodosEnEstado) {
-		this.periodosEnEstado = periodosEnEstado;
-	}
-
 	private double ahorros;
 	//antiguedad
 	private int periodosEnEstado=0;
@@ -48,5 +40,12 @@ public class Adulto extends Ser implements Comparable<Adulto> {
 	@Override
 	public int compareTo(Adulto o) {
 		return periodosEnEstado-o.periodosEnEstado;
+	}
+	public int getPeriodosEnEstado() {
+		return periodosEnEstado;
+	}
+
+	public void setPeriodosEnEstado(int periodosEnEstado) {
+		this.periodosEnEstado = periodosEnEstado;
 	}
 }

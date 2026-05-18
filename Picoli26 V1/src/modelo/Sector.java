@@ -29,7 +29,7 @@ public abstract class Sector<T extends Ser>  {
 	
 	public double pago(double deficit) {
 		double pagoSector = this.pago;
-		double pagoTotalPorSector = miembros.size() * pagoSector;;
+		double pagoTotalPorSector = miembros.size() * pagoSector;
 		if (deficit < 0) {
 			double presupuestoCorregidoMaximo = pagoTotalPorSector * reduccionMaxima;
 			double presupuestoSectorReal = pagoTotalPorSector + deficit;
