@@ -26,6 +26,7 @@ public abstract class Sector<T extends Ser>  {
 	}
 	
 	public abstract T getFirst();
+	public abstract void addLast(T t);
 	
 	public double pago(double deficit) {
 		double pagoSector = this.pago;

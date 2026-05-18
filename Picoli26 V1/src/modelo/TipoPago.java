@@ -27,4 +27,9 @@ public enum TipoPago {
 	public double getReduccionMaxima() {
 		return reduccionMaxima;
 	}
+
+	public static double getNecesidadvitalbase() {
+		return necesidadVitalBase;
+	}
+	
 }

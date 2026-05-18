@@ -15,7 +15,13 @@ public class SerTest {
     @Test
     public void testMenorCrecerSaludable() {
         double necesidadVital = 100.0;
-        Menor menor = new Menor(80.0, necesidadVital);
+        Menor menor = null;
+		try {
+			menor = new Menor(80);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
         for (int i = 0; i < 10; i++) {
             menor.alimentar(necesidadVital);
@@ -30,7 +36,13 @@ public class SerTest {
     @Test
     public void testMenorMuertePorDeficit() {
         double necesidadVital = 100.0;
-        Menor menor = new Menor(80.0, necesidadVital);
+        Menor menor = null;
+		try {
+			menor = new Menor(80);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
         for (int i = 0; i < 18; i++) {
             menor.alimentar(necesidadVital / 2.0);
@@ -44,7 +56,13 @@ public class SerTest {
 
     @Test
     public void testAdultoEmpleado() {
-        Adulto adulto = new Adulto(18, 80.0, 100.0, 0);
+        Adulto adulto = null;
+		try {
+			adulto = new Adulto(18, 80);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         adulto.alimentar(200.0);
 
         assertEquals(100.0, adulto.getAhorros(), 0.01, "Ahorro correcto");
@@ -53,7 +71,13 @@ public class SerTest {
 
     @Test
     public void testAdultoParoConAyudaDelEstado() {
-        Adulto adulto = new Adulto(18, 80.0, 100.0, 50.0);
+        Adulto adulto = null;
+		try {
+			adulto = new Adulto(18, 80);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         adulto.alimentar(50.0);
 
         assertEquals(0.0, adulto.getAhorros(), 0.01, "Ahorro consumido por estado");
@@ -62,7 +86,13 @@ public class SerTest {
 
     @Test
     public void testAdultoParoVidaDecrecePorDeficit() {
-        Adulto adulto = new Adulto(18, 80.0, 100.0, 50.0);
+        Adulto adulto = null;
+		try {
+			adulto = new Adulto(18, 80.0);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         adulto.alimentar(20.0);
 
         assertEquals(0.0, adulto.getAhorros(), 0.01, "Consumido todo ahorro");
@@ -71,7 +101,13 @@ public class SerTest {
 
     @Test
     public void testAncianoPierdeHastaUnPeriodo() {
-        Ser anciano = new Ser(65, 80.0, 50.0);
+        Ser anciano = null;
+		try {
+			anciano = new Ser(65, 80.0, 50.0);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         assertEquals(50.0, anciano.getNecesidadVital(), 0.01, "Necesidad anciano");
 
         anciano.alimentar(25.0);
@@ -80,7 +116,13 @@ public class SerTest {
 
     @Test
     public void testSerPierdeHastaDosPeriodos() {
-        Ser anciano = new Ser(65, 80.0, 100.0);
+        Ser anciano = null;
+		try {
+			anciano = new Ser(65, 80.0, 100.0);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         anciano.alimentar(5.0);
 
         assertEquals(78.34, anciano.getEsperanzaVida(), 0.21, "Esperanza bajó casi doble");
@@ -88,19 +130,37 @@ public class SerTest {
 
     @Test
     public void testTransicionesDeEtapas() {
-        Menor menor = new Menor(80.0, 100.0);
+        Menor menor = null;
+		try {
+			menor = new Menor(80);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         for (int i = 0; i < 18; i++)
             menor.envejecer();
         menor.setFactorDesarrollo(60.0);
 
-        Adulto adulto = new Adulto(menor, true, 100.0);
+        Adulto adulto = null;
+		try {
+			adulto = new Adulto(menor);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         assertEquals(18, adulto.getEdadActual(), 0, "Edad transicion 1");
         assertEquals(80.0, adulto.getEsperanzaVida(), 0.01, "Esperanza transicion 1");
 
         adulto.alimentar(300.0);
         assertEquals(200.0, adulto.getAhorros(), 0.01, "Ahorro al transicionar");
 
-        Ser anciano = new Ser(adulto);
+        Ser anciano = null;
+		try {
+			anciano = new Ser(adulto);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         assertEquals(18, anciano.getEdadActual(), 0, "Edad tr 2");
         assertEquals(50.0, anciano.getNecesidadVital(), 0.01, "Necesidad Vital tr 2");
     }

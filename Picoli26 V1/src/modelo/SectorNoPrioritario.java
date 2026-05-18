@@ -13,4 +13,9 @@ public class SectorNoPrioritario<T extends Ser> extends Sector<T> {
 		return ((ArrayList<T>)getMiembros()).getFirst();
 	}
 
+	@Override
+	public void addLast(T t) {
+		((ArrayList<T>)getMiembros()).addLast(t);
+	}
+
 }

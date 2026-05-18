@@ -6,10 +6,12 @@ import static modelo.TipoPago.parado;
 import static modelo.TipoPago.trabajador;
 
 import java.util.AbstractCollection;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.Random;
 
 public class Estado {
 	// atributos sobre desarrollo
@@ -17,7 +19,8 @@ public class Estado {
 	private double cantidadProducidaPorTrabajador;
 	private final double edadJubilacion = 65;
 	private final double edadMadurez = 18;
-	private final double necesidadVitalBase = 100;
+	private ArrayDeque<Double> historicoIncrementosDemanda;
+	private int defuncionesPeridoAnterior;
 
 	// poblacion
 	private Sector<Menor> menores;
@@ -34,18 +37,83 @@ public class Estado {
 		trabajadores = new SectorPrioritario<Adulto>(trabajador);
 		ancianos = new SectorNoPrioritario<Ser>(anciano);
 		parados = new SectorPrioritarioParados(parado);
+		historicoIncrementosDemanda = new ArrayDeque<Double>(5);
 	}
 
-	public void abrirPeriodo(double porcentajeIncrementoDemanda) {
+	public void abrirPeriodo(double porcentajeIncrementoDemanda) throws Exception {
 		// 1 calcular la cantidad que debe producir el estado segun el incremento (puede
 //		// ser una cantidad menor)
-//		double objetivoProduccion = calcularCantidadAProducir(porcentajeIncrementoProduccion);
-		totalDemandado *= 1 + porcentajeIncrementoDemanda;
+		if (porcentajeIncrementoDemanda < -.99 || porcentajeIncrementoDemanda > .99)
+			throw new Exception();
+		double objetivoProduccion = calcularCantidadAProducir(porcentajeIncrementoDemanda);
+		almacenarNuevoPeriodo(porcentajeIncrementoDemanda);
 //		// 2 Contratar o despedir a adultos segun sea la necesidad
-//		gestionarEmpleos(objetivoProduccion);
+		gestionarEmpleos(objetivoProduccion);
 //		// 3 decidir los nacimientos en funcion de cuantas defunciones, y otras cosas,
 //		// hayan pasado en el periodo anterior
-//		gestionarNacimientos();
+		gestionarNacimientos();
+	}
+
+	private void gestionarNacimientos() {
+		double calcularMediaIncrementos = calcularMediaIncrementos();
+		int nacimientos = (int) (this.defuncionesPeridoAnterior * (1 - calcularMediaIncrementos));
+		Random random = new Random();
+		for (int i = 0; i < nacimientos; i++) {
+			try {
+				menores.addLast(new Menor());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private double calcularMediaIncrementos() {
+		double acumulador = 0;
+		for (Double periodo : historicoIncrementosDemanda) {
+			acumulador += periodo;
+		}
+		return acumulador / historicoIncrementosDemanda.size();
+
+	}
+
+	private void almacenarNuevoPeriodo(double porcentajeIncrementoDemanda) {
+		historicoIncrementosDemanda.poll();
+		historicoIncrementosDemanda.offer(porcentajeIncrementoDemanda);
+	}
+
+	private void gestionarEmpleos(double objetivoProduccion) {
+		double totalProducidoPeriodoActual = (trabajadores.size() * cantidadProducidaPorTrabajador);
+		double diferenciaProduccionProximoPeriodo = objetivoProduccion - totalProducidoPeriodoActual;
+		int diferenciaTrabajadoresNecesarios = (int) (diferenciaProduccionProximoPeriodo
+				/ cantidadProducidaPorTrabajador);
+		// El truco para no usar if-else
+		// Parto de una premisa (condicion inicial)
+		// digo que diferenciaProduccionProximoPeriodo<=0 por lo tanto debo despedir
+		// trabajadores
+		// por eso el sector fuente (la cola de donde saco seres) debe ser trabajadores
+		// y el sector que los gana, destino, son los parados.
+		Sector<Adulto> fuente = trabajadores;
+		Sector<Adulto> destino = parados;
+		// si no es asi, entonces intercambio quien es la fuente y quien es el destino
+		// Con esto respeto DRY porque si no repetiria el codigo de gestion de sectores
+		// tendria que poner dos veces lo que hay dentro de intercambioSeres
+		if (diferenciaProduccionProximoPeriodo > 0) {
+			fuente = parados;
+			destino = trabajadores;
+		}
+		intercambioSeres(fuente, destino, Math.abs(diferenciaTrabajadoresNecesarios));
+	}
+
+	private void intercambioSeres(Sector<Adulto> fuente, Sector<Adulto> destino, int cantidad) {
+		for (int i = 0; i < cantidad; i++) {
+			Adulto first = fuente.getFirst();
+			destino.addLast(first);
+			first.inicializaPeriodoEnEstado();
+		}
+	}
+
+	private double calcularCantidadAProducir(double porcentajeIncrementoDemanda) {
+		return totalDemandado *= 1 + porcentajeIncrementoDemanda;
 	}
 
 	////////////////////////////////////////////////////
@@ -102,12 +170,15 @@ public class Estado {
 
 	// Pendiente para el lunes 13 abril robar a los muertos
 	private void enterrar(AbstractCollection<? extends Ser>... listas) {
+		this.defuncionesPeridoAnterior = 0;
 		for (AbstractCollection<? extends Ser> poblacion : listas) {
 			Iterator<? extends Ser> iterator = poblacion.iterator();
 			while (iterator.hasNext()) {
 				Ser ser = iterator.next();
 				if (!ser.isVivo()) {
 					iterator.remove();
+					this.capital+=ser.entregarAlEstado();
+					defuncionesPeridoAnterior++;
 				}
 			}
 		}
@@ -117,13 +188,15 @@ public class Estado {
 		for (AbstractCollection<Adulto> lista : listas) {
 			Iterator<Adulto> iterator = lista.iterator();
 			while (iterator.hasNext()) {
-				// sustituye al for
-//			for (Adulto adulto : lista) {
 				Adulto adulto = iterator.next();
 				if (isAnciano(adulto)) {
 					this.capital += adulto.getAhorros();
 					iterator.remove();
-					ancianos.getMiembros().add(new Ser(adulto));
+					try {
+						ancianos.getMiembros().add(new Ser(adulto));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}

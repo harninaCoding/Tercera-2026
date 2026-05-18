@@ -22,15 +22,37 @@ class EstadoJubilarTest {
 	void beforeEach() {
 		estado=new Estado();
 		necesidadVital = 100;
-		adulto=new Adulto(64, 90, necesidadVital, 0);
-		adulto2=new Adulto(62, 63, necesidadVital, 0);
+		try {
+			adulto=new Adulto(64, 90);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			adulto2=new Adulto(62, 63);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Test
 	void testEnvejecer() {
 		//Crear una poblacion base
-		Menor menor=new Menor(90, necesidadVital);
-		Ser anciano=new Ser(adulto2);
+		Menor menor = null;
+		try {
+			menor = new Menor(90);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Ser anciano = null;
+		try {
+			anciano = new Ser(adulto2);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		////////////////////
 		estado.getMenores().add(menor);
 		estado.getAncianos().add(anciano);

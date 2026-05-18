@@ -1,14 +1,24 @@
 package modelo;
 
+import java.util.Random;
+
 public class Menor extends Ser {
     private double factorDesarrollo;
 
-    public Menor(double esperanzaVida, double necesidadVital) {
-        super(esperanzaVida, necesidadVital);
+    public Menor(int esperanzaVida, double necesidadVital) throws Exception  {
+        super(0,esperanzaVida, necesidadVital);
         this.factorDesarrollo = 0;
     }
+   
+    public Menor() throws Exception  {
+		this(new Random().nextInt(Ser.getEsperanzavidamaxima()),TipoPago.menor.getNecesidadVital());
+	}
 
-    @Override
+	public Menor(int esperanzaVida) throws Exception {
+		this(esperanzaVida,TipoPago.menor.getNecesidadVital());
+	}
+
+	@Override
     public void alimentar(double cantidadEntregada) {
         if (cantidadEntregada >= necesidadVital) {
             factorDesarrollo += 5.55;
