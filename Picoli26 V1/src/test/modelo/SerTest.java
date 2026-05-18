@@ -44,7 +44,7 @@ public class SerTest {
 
     @Test
     public void testAdultoEmpleado() {
-        Adulto adulto = new Adulto(18, 80.0, 100.0, 0, true);
+        Adulto adulto = new Adulto(18, 80.0, 100.0, 0);
         adulto.alimentar(200.0);
 
         assertEquals(100.0, adulto.getAhorros(), 0.01, "Ahorro correcto");
@@ -53,7 +53,7 @@ public class SerTest {
 
     @Test
     public void testAdultoParoConAyudaDelEstado() {
-        Adulto adulto = new Adulto(18, 80.0, 100.0, 50.0, false);
+        Adulto adulto = new Adulto(18, 80.0, 100.0, 50.0);
         adulto.alimentar(50.0);
 
         assertEquals(0.0, adulto.getAhorros(), 0.01, "Ahorro consumido por estado");
@@ -62,7 +62,7 @@ public class SerTest {
 
     @Test
     public void testAdultoParoVidaDecrecePorDeficit() {
-        Adulto adulto = new Adulto(18, 80.0, 100.0, 50.0, false);
+        Adulto adulto = new Adulto(18, 80.0, 100.0, 50.0);
         adulto.alimentar(20.0);
 
         assertEquals(0.0, adulto.getAhorros(), 0.01, "Consumido todo ahorro");
