@@ -16,11 +16,11 @@ import java.util.Random;
 public class Estado {
 	// atributos sobre desarrollo
 	private double capital = 0;
-	private double cantidadProducidaPorTrabajador;
+	public double cantidadProducidaPorTrabajador;
 	private final double edadJubilacion = 65;
 	private final double edadMadurez = 18;
-	private ArrayDeque<Double> historicoIncrementosDemanda;
-	private int defuncionesPeridoAnterior;
+	public ArrayDeque<Double> historicoIncrementosDemanda;
+	public int defuncionesPeridoAnterior;
 
 	// poblacion
 	private Sector<Menor> menores;
@@ -29,7 +29,7 @@ public class Estado {
 	private Sector<Ser> ancianos;
 
 	// prduccion
-	private double totalDemandado = 0;
+	public double totalDemandado = 0;
 
 	public Estado() {
 		super();
@@ -77,7 +77,9 @@ public class Estado {
 	}
 
 	private void almacenarNuevoPeriodo(double porcentajeIncrementoDemanda) {
-		historicoIncrementosDemanda.poll();
+		if (historicoIncrementosDemanda.size() >= 5) {
+			historicoIncrementosDemanda.poll();
+		}
 		historicoIncrementosDemanda.offer(porcentajeIncrementoDemanda);
 	}
 
@@ -106,9 +108,15 @@ public class Estado {
 
 	private void intercambioSeres(Sector<Adulto> fuente, Sector<Adulto> destino, int cantidad) {
 		for (int i = 0; i < cantidad; i++) {
-			Adulto first = fuente.getFirst();
-			destino.addLast(first);
-			first.inicializaPeriodoEnEstado();
+			if (fuente.size() > 0) {
+				Adulto first = fuente.getFirst();
+				if (first != null) {
+					destino.addLast(first);
+					first.inicializaPeriodoEnEstado();
+				}
+			} else {
+				break;
+			}
 		}
 	}
 
@@ -141,15 +149,12 @@ public class Estado {
 	}
 
 	private void pagar(Sector<? extends Ser>... sector) {
-		double deficit = 0;
 		for (Sector<? extends Ser> poblacion : sector) {
 			double presupuestoMaximo = poblacion.getTotalPago();
-			deficit = capital - presupuestoMaximo;
+			double deficit = capital - presupuestoMaximo;
 			double pagoReal = poblacion.pago(deficit);
 			capital -= pagoReal;
-			deficit += presupuestoMaximo - pagoReal;
 		}
-		capital += deficit;
 	}
 
 	private boolean hayDeficit(double presupuesto) {

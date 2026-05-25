@@ -2,7 +2,7 @@ package modelo;
 
 //Comparable es la comparacion del objeto con otro objeto
 public class Adulto extends Ser implements Comparable<Adulto> {
-	private double ahorros;
+	public double ahorros;
 	//antiguedad
 	private int periodosEnEstado=0;
 
